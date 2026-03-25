@@ -1,0 +1,42 @@
+import { useEffect, useState } from "react";
+interface Pokemon {
+  id: number;
+  name: string;
+  imageUrl: string;
+}
+
+interface Props {
+  id: number;
+}
+
+export const usePokemon = ({ id }: Props) => {
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const getPokemonById = async (id: number) => {
+    setIsLoading(true);
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const data = await response.json();
+
+    setPokemon({
+      id: id,
+      name: data.name,
+      imageUrl: data.sprites.front_default,
+    });
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    getPokemonById(id);
+  }, [id]);
+
+  return {
+    // Props
+    isLoading,
+    pokemon,
+
+    // Computed
+    formattedId: id.toString().padStart(3, "0"),
+  };
+};
